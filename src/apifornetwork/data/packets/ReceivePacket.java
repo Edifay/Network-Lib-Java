@@ -4,14 +4,15 @@ import apifornetwork.data.Data;
 
 public class ReceivePacket extends Packet {
 
-    public ReceivePacket(final byte[][] allData) {
+    public ReceivePacket(final byte[][] allData, final boolean isFastPacket) {
         this.data = allData;
+        this.isFastPacket = isFastPacket;
     }
 
-    public ReceivePacket(final byte[][] allData, final short packetNumber) {
+    public ReceivePacket(final byte[][] allData, final short packetNumber, final boolean isFastPacket) {
         this.data = allData;
         this.packetNumber = packetNumber;
-
+        this.isFastPacket = isFastPacket;
     }
 
     public short getPacketNumber() {

@@ -1,7 +1,6 @@
-package apifornetwork.udp.server;
+package apifornetwork.udp.client;
 
-import apifornetwork.tcp.server.ServerTCP;
-import apifornetwork.udp.Auth;
+import apifornetwork.tcp.client.ClientTCP;
 import apifornetwork.udp.UDPUsage;
 
 import java.io.IOException;
@@ -12,14 +11,15 @@ import java.util.concurrent.Executors;
 
 import static apifornetwork.tcp.server.ServerTCP.packetFastSize;
 
-public class ServerUDP extends UDPUsage {
+public class ClientUDP extends UDPUsage {
 
-    protected final ServerTCP serverTCP;
+    protected ClientTCP socket;
+
     protected ExecutorService exe = Executors.newCachedThreadPool();
 
-    public ServerUDP(final int port, final ServerTCP serverTCP) throws SocketException {
-        super(port);
-        this.serverTCP = serverTCP;
+    public ClientUDP(final ClientTCP client) throws SocketException {
+        super();
+        this.socket = client;
     }
 
     @Override
@@ -27,12 +27,13 @@ public class ServerUDP extends UDPUsage {
         synchronized (this.listen) {
             this.listen = new Thread(() -> {
                 try {
-
                     while (true) {
                         byte[] data = new byte[packetFastSize];
                         DatagramPacket packet = new DatagramPacket(data, data.length);
                         this.receive(packet);
-                        this.exe.submit(() -> this.serverTCP.getClient(new Auth(packet.getPort(), packet.getAddress())).receiveFastPacket(data));
+                        this.exe.submit(() -> {
+                            this.socket.receiveFastPacket(data);
+                        });
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -41,5 +42,4 @@ public class ServerUDP extends UDPUsage {
             this.listen.start();
         }
     }
-
 }

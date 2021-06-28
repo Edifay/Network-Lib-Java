@@ -10,16 +10,27 @@ import java.nio.ByteOrder;
 
 public abstract class Packet {
 
+    protected boolean isFastPacket;
+
     protected byte[][] data;
 
-    protected final int headSize = 6;
+    protected static final short headSize = 9;
 
     protected short packetNumber;
 
     public abstract Data getData();
 
+    protected short ID;
+
     public byte[][] getBytes() {
         return this.data;
+    }
+
+    public byte[] getBytesData() {
+        byte[] data = new byte[this.data.length * (this.data[0].length - headSize)];
+        for (int i = 0; i < this.data.length; i++)
+            System.arraycopy(this.data[i], headSize, data, i * (this.data[i].length - headSize), this.data[i].length - headSize);
+        return data;
     }
 
     public static short getShort(byte one, byte two) {
@@ -42,6 +53,14 @@ public abstract class Packet {
         ObjectOutputStream out = new ObjectOutputStream(outArray);
         out.writeObject(obj);
         return outArray.toByteArray();
+    }
+
+    public boolean isFastPacket() {
+        return this.isFastPacket;
+    }
+
+    public short getID() {
+        return this.ID;
     }
 
 }
