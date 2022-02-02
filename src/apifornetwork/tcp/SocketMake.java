@@ -128,17 +128,20 @@ public abstract class SocketMake {
     }
 
     public ReceivePacket waitForPacket(int packetNumber) throws InterruptedException {
-        Thread.currentThread().setName("CACA");
         final Thread atNotify = Thread.currentThread();
-        AtomicReference<ReceivePacket> receivePacket = new AtomicReference<>();
-        this.addPacketEvent(packetNumber, (packet) -> {
+        final AtomicReference<ReceivePacket> receivePacket = new AtomicReference<>();
+
+        final RunnableParamPacket event = (packet) -> {
             synchronized (atNotify) {
-                atNotify.notify();
                 receivePacket.set(packet);
+                atNotify.notify();
             }
-        });
+        };
+
+        this.addPacketEvent(packetNumber, event);
         synchronized (Thread.currentThread()) {
             Thread.currentThread().wait();
+            this.removePacketEvent(packetNumber, event);
         }
         return receivePacket.get();
     }
