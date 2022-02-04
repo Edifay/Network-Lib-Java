@@ -1,12 +1,14 @@
 package apifornetwork.tcp.server;
 
 
+import apifornetwork.tcp.SocketMake;
+
 public final class NewClientEvent extends ServerTCPEvent {
 
-    protected SocketClient socket;
+    protected SocketMake socket;
     protected RunnableParamSocket event;
 
-    public NewClientEvent(SocketClient socket, RunnableParamSocket event) {
+    public NewClientEvent(SocketMake socket, RunnableParamSocket event) {
         this.socket = socket;
         this.event = event;
     }

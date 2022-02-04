@@ -1,8 +1,8 @@
 package apifornetwork.tcp.server;
 
-import java.io.IOException;
+import apifornetwork.tcp.SocketMake;
 
 public interface RunnableParamSocket {
 
-    void run(SocketClient socket);
+    void run(SocketMake socket);
 }
