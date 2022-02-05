@@ -15,7 +15,7 @@ public class Data {
 
     public Object getObject(Object typeAtRend) throws IOException, ClassNotFoundException {
         inByte.reset();
-        Object obj = new ObjectInputStream(inByte).readObject();
+        Object obj = new ObjectInputStream(inByte).readUnshared();
         if (obj.getClass().getName().equals(typeAtRend.getClass().getName()))
             return obj;
         throw new ClassNotFoundException("The class asked isn't found !");

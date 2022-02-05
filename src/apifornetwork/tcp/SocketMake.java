@@ -62,7 +62,7 @@ public abstract class SocketMake {
                 Thread.currentThread().setName("Client: Listening !");
                 try {
                     while (true) {
-                        ReceivePacket receivePacket = new NotFinalizedReceivePacket((byte[][]) this.in.readObject(), false).waitForFinalized();
+                        ReceivePacket receivePacket = new NotFinalizedReceivePacket((byte[][]) this.in.readUnshared(), false).waitForFinalized();
                         this.emit(receivePacket);
                     }
                 } catch (IOException | ClassNotFoundException | InterruptedException e) {
@@ -92,8 +92,9 @@ public abstract class SocketMake {
     }
 
     public synchronized void send(SendPacket packet) throws IOException {
-        this.out.writeObject(packet.getBytes());
+        this.out.writeUnshared(packet.getBytes());
         this.out.flush();
+        this.out.reset();
     }
 
     public void addPacketEvent(int packetNumber, RunnableParamPacket event) {

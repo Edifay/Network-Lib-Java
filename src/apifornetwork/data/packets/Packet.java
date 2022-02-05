@@ -51,7 +51,7 @@ public abstract class Packet {
     public static byte[] getByteForObject(Object obj) throws IOException {
         ByteArrayOutputStream outArray = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(outArray);
-        out.writeObject(obj);
+        out.writeUnshared(obj);
         return outArray.toByteArray();
     }
 
