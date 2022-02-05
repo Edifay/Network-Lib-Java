@@ -1,12 +1,10 @@
 package apifornetwork.tcp;
 
-import apifornetwork.data.packets.NotFinalizedReceivePacket;
-import apifornetwork.data.packets.PacketIDManager;
-import apifornetwork.data.packets.ReceivePacket;
-import apifornetwork.data.packets.SendPacket;
+import apifornetwork.data.packets.*;
 import apifornetwork.udp.Auth;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -62,10 +60,10 @@ public abstract class SocketMake {
                 Thread.currentThread().setName("Client: Listening !");
                 try {
                     while (true) {
-                        ReceivePacket receivePacket = new NotFinalizedReceivePacket((byte[][]) this.in.readUnshared(), false).waitForFinalized();
+                        ReceiveSecurePacket receivePacket = new ReceiveSecurePacket((byte[]) this.in.readUnshared());
                         this.emit(receivePacket);
                     }
-                } catch (IOException | ClassNotFoundException | InterruptedException e) {
+                } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             });
@@ -73,7 +71,7 @@ public abstract class SocketMake {
         }
     }
 
-    public void emit(ReceivePacket packet) {
+    public void emit(Packet packet) {
         new Thread(() -> {
             synchronized (this.events) {
                 for (RunnableParamPacket event : this.eventsOnAll)
@@ -91,8 +89,10 @@ public abstract class SocketMake {
         }
     }
 
-    public synchronized void send(SendPacket packet) throws IOException {
-        this.out.writeUnshared(packet.getBytes());
+    public synchronized void send(Packet packet) throws IOException {
+        if (!(packet instanceof SendSecurePacket))
+            throw new IOException("Wrong packet");
+        this.out.writeUnshared(packet.getBytesData());
         this.out.flush();
         this.out.reset();
     }
@@ -128,13 +128,13 @@ public abstract class SocketMake {
         }
     }
 
-    public ReceivePacket waitForPacket(int packetNumber) throws InterruptedException {
+    public ReceiveSecurePacket waitForPacket(int packetNumber) throws InterruptedException {
         final Thread atNotify = Thread.currentThread();
-        final AtomicReference<ReceivePacket> receivePacket = new AtomicReference<>();
+        final AtomicReference<ReceiveSecurePacket> receivePacket = new AtomicReference<>();
 
         final RunnableParamPacket event = (packet) -> {
             synchronized (atNotify) {
-                receivePacket.set(packet);
+                receivePacket.set((ReceiveSecurePacket) packet);
                 atNotify.notify();
             }
         };
@@ -158,11 +158,11 @@ public abstract class SocketMake {
             short id = getPacketID(data);
 
             if (!this.receivingPacket.containsKey(id)) {
-                NotFinalizedReceivePacket receivePacket = new NotFinalizedReceivePacket(data, true);
+                NotFinalizedReceivePacket receivePacket = new NotFinalizedReceivePacket(data);
                 this.receivingPacket.put(id, receivePacket);
                 this.exe.submit(() -> {
                     try {
-                        ReceivePacket packet = receivePacket.waitForFinalized(10000L);
+                        ReceiveFastPacket packet = receivePacket.waitForFinalized(10000L);
                         if (packet != null)
                             this.emit(packet);
 
@@ -170,7 +170,7 @@ public abstract class SocketMake {
 
                         byte[] dataShort = new byte[2];
                         System.arraycopy(getByteFromShort(id), 0, dataShort, 0, 2);
-                        send(new SendPacket((short) -2, dataShort, (short) dataShort.length));
+                        send(new SendFastPacket((short) -2, dataShort, (short) dataShort.length));
                     } catch (InterruptedException | IOException e) {
                         e.printStackTrace();
                     }
@@ -228,4 +228,5 @@ public abstract class SocketMake {
     public void close() throws IOException {
         this.s.close();
     }
+
 }

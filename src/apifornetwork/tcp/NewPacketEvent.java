@@ -1,16 +1,16 @@
 package apifornetwork.tcp;
 
 
-import apifornetwork.data.packets.NotFinalizedReceivePacket;
-import apifornetwork.data.packets.ReceivePacket;
+import apifornetwork.data.packets.Packet;
+import apifornetwork.data.packets.ReceiveFastPacket;
 import apifornetwork.tcp.server.ServerTCPEvent;
 
 public final class NewPacketEvent extends ServerTCPEvent {
 
-    protected ReceivePacket packet;
+    protected Packet packet;
     protected RunnableParamPacket event;
 
-    public NewPacketEvent(ReceivePacket packet, RunnableParamPacket event) {
+    public NewPacketEvent(Packet packet, RunnableParamPacket event) {
         this.packet = packet;
         this.event = event;
     }

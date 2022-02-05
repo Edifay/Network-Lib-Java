@@ -1,13 +1,11 @@
 package apifornetwork.tcp.server;
 
-import apifornetwork.data.packets.ReceivePacket;
-import apifornetwork.data.packets.SendPacket;
+import apifornetwork.data.packets.*;
 import apifornetwork.tcp.SocketMake;
 import apifornetwork.udp.Auth;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class SocketClient extends SocketMake {
 
@@ -22,18 +20,20 @@ public class SocketClient extends SocketMake {
         byte[] data = new byte[1];
         if (this.server.initFastPacket())
             data[0] = 0x1;
-        this.send(new SendPacket((short) -3, data, (short) 1));
-        ReceivePacket packet = this.waitForPacket(-4);
+        this.send(new SendFastPacket((short) -3, data, (short) 1));
+        ReceiveSecurePacket packet = this.waitForPacket(-4);
         this.identity = new Auth(getInteger(packet.getBytesData()), this.s.getInetAddress());
     }
 
     @Override
-    public synchronized void send(SendPacket packet) throws IOException {
-        if (packet.isFastPacket()) {
-            packet.setServerSender(this);
-            this.server.sendFastPacket(packet, this.identity);
-        } else
+    public synchronized void send(Packet packet) throws IOException {
+        if (packet instanceof SendFastPacket) {
+            ((SendFastPacket) packet).setServerSender(this);
+            this.server.sendFastPacket((SendFastPacket) packet, this.identity);
+        } else if (packet instanceof SendSecurePacket)
             super.send(packet);
+        else
+            throw new IOException("Wrong send packet");
     }
 
 }

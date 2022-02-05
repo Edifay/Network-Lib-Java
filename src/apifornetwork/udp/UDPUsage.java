@@ -1,6 +1,6 @@
 package apifornetwork.udp;
 
-import apifornetwork.data.packets.SendPacket;
+import apifornetwork.data.packets.SendFastPacket;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -22,7 +22,7 @@ public abstract class UDPUsage extends DatagramSocket {
         this.listen = new Thread();
     }
 
-    public void sendPacket(SendPacket packet, Auth identities) throws IOException {
+    public void sendPacket(SendFastPacket packet, Auth identities) throws IOException {
         for (int i = 0; i < packet.getBytes().length; i++) {
             this.send(new DatagramPacket(packet.getBytes()[i], packet.getBytes()[i].length, identities.getIp(), identities.getPort()));
         }

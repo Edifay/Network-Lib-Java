@@ -1,9 +1,9 @@
 package apifornetwork.tcp.Secure;
 
-import apifornetwork.data.packets.ReceivePacket;
-import apifornetwork.data.packets.SendPacket;
+import apifornetwork.data.packets.Packet;
+import apifornetwork.data.packets.SendFastPacket;
+import apifornetwork.data.packets.SendSecurePacket;
 import apifornetwork.tcp.SocketMake;
-import apifornetwork.udp.Auth;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -29,12 +29,11 @@ public class SecureSocketClient extends SocketMake {
     }*/
 
     @Override
-    public synchronized void send(SendPacket packet) throws IOException {
-        if (packet.isFastPacket()) {
-            packet.setServerSender(this);
-            //this.server.sendFastPacket(packet, this.identity);
-        } else
+    public synchronized void send(Packet packet) throws IOException {
+        if (packet instanceof SendSecurePacket)
             super.send(packet);
+        else
+            throw new IOException("Wrong packet to send");
     }
 
 }

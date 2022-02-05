@@ -1,6 +1,6 @@
 package apifornetwork.tcp.server;
 
-import apifornetwork.data.packets.SendPacket;
+import apifornetwork.data.packets.SendFastPacket;
 import apifornetwork.tcp.SocketMake;
 import apifornetwork.udp.Auth;
 import apifornetwork.udp.server.ServerUDP;
@@ -119,7 +119,7 @@ public class ServerTCP extends ServerSocket {
         return null;
     }
 
-    public void sendFastPacket(SendPacket packet, Auth identities) throws IOException {
+    public void sendFastPacket(SendFastPacket packet, Auth identities) throws IOException {
         this.udp.sendPacket(packet, identities);
     }
 

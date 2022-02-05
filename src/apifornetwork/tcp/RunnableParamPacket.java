@@ -1,9 +1,9 @@
 package apifornetwork.tcp;
 
-import apifornetwork.data.packets.ReceivePacket;
+import apifornetwork.data.packets.Packet;
 
 import java.util.EventListener;
 
 public interface RunnableParamPacket extends EventListener {
-    void run(ReceivePacket socket);
+    void run(Packet socket);
 }

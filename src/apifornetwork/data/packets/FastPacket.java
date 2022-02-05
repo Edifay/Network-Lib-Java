@@ -1,15 +1,21 @@
 package apifornetwork.data.packets;
 
-import java.io.IOException;
+public abstract class FastPacket extends Packet {
 
-public class FastPacket extends SendPacket {
-    public FastPacket(short packetNumber, byte[] data, short packetSize) {
-        super(packetNumber, data, packetSize);
-        this.isFastPacket = true;
+    protected byte[][] data;
+
+    protected final short packetSize;
+
+    protected FastPacket(final short packetSize) {
+        this.packetSize = packetSize;
     }
 
-    public FastPacket(final short packetNumber, final byte[] data) throws IOException {
-        super(packetNumber, data);
-        this.isFastPacket = true;
+    @Override
+    public byte[] getBytesData() {
+        byte[] data = new byte[this.data.length * (this.data[0].length - headSize)];
+        for (int i = 0; i < this.data.length; i++)
+            System.arraycopy(this.data[i], headSize, data, i * (this.data[i].length - headSize), this.data[i].length - headSize);
+        return data;
     }
+
 }

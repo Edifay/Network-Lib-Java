@@ -1,25 +1,23 @@
 package apifornetwork.data.packets;
 
-import apifornetwork.data.Data;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class NotFinalizedReceivePacket extends ReceivePacket {
+public class NotFinalizedReceivePacket extends ReceiveFastPacket {
 
     private final ArrayList<Thread> waitingForFinalize;
     private short[] packetsReceived;
 
-    public NotFinalizedReceivePacket(final byte[][] allData, final boolean isFastPacket) {
-        super(allData, isFastPacket);
+    public NotFinalizedReceivePacket(final byte[][] allData ) {
+        super(allData);
         this.packetNumber = getShort(this.data[0][5], this.data[0][6]);
         this.waitingForFinalize = new ArrayList<>();
         this.packetsReceived = new short[this.data.length];
         emit();
     }
 
-    public NotFinalizedReceivePacket(final byte[] firstPacketFound, final boolean isFastPacket) {
-        super(new byte[getShort(firstPacketFound[3], firstPacketFound[4])][firstPacketFound.length], getShort(firstPacketFound[5], firstPacketFound[6]), isFastPacket);
+    public NotFinalizedReceivePacket(final byte[] firstPacketFound) {
+        super(new byte[getShort(firstPacketFound[3], firstPacketFound[4])][firstPacketFound.length], getShort(firstPacketFound[5], firstPacketFound[6]));
         this.packetsReceived = new short[this.data.length];
         Arrays.fill(this.packetsReceived, (short) -1);
         short actualIndex = getShort(firstPacketFound[1], firstPacketFound[2]);
@@ -37,12 +35,6 @@ public class NotFinalizedReceivePacket extends ReceivePacket {
         verifyAndEmit();
     }
 
-
-    @Override
-    public Data getData() {
-        return null;
-    }
-
     final public boolean isFinalized() {
         for (short s : this.packetsReceived)
             if (s != 0)
@@ -50,7 +42,7 @@ public class NotFinalizedReceivePacket extends ReceivePacket {
         return true;
     }
 
-    public ReceivePacket waitForFinalized(long millis) throws InterruptedException {
+    public ReceiveFastPacket waitForFinalized(long millis) throws InterruptedException {
         if (!isFinalized())
             try {
                 synchronized (this) {
@@ -69,10 +61,10 @@ public class NotFinalizedReceivePacket extends ReceivePacket {
                     this.waitingForFinalize.remove(Thread.currentThread());
                 }
             }
-        return new ReceivePacket(this.data, this.packetNumber, this.isFastPacket);
+        return new ReceiveFastPacket(this.data, this.packetNumber);
     }
 
-    public ReceivePacket waitForFinalized() throws InterruptedException {
+    public ReceiveFastPacket waitForFinalized() throws InterruptedException {
         return waitForFinalized(0L);
     }
 

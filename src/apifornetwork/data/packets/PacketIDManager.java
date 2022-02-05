@@ -36,7 +36,7 @@ public class PacketIDManager {
         this.alreadyUsed.add(used);
         byte[] data = new byte[2];
         System.arraycopy(getByteFromShort(used), 0, data, 0, 2);
-        this.socket.send(new SendPacket((short) -1, data, (short) data.length));
+        this.socket.send(new SendFastPacket((short) -1, data, (short) data.length));
         this.exe.submit(() -> {
             try {
                 Thread.sleep(20000);

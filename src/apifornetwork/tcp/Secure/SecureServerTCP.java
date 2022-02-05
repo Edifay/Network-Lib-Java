@@ -1,17 +1,13 @@
 package apifornetwork.tcp.Secure;
 
-import apifornetwork.data.packets.SendPacket;
 import apifornetwork.tcp.SocketMake;
 import apifornetwork.tcp.server.NewClientEvent;
 import apifornetwork.tcp.server.RunnableParamSocket;
-import apifornetwork.tcp.server.SocketClient;
 import apifornetwork.udp.Auth;
-import apifornetwork.udp.server.ServerUDP;
 
 import javax.net.ssl.SSLServerSocket;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.SocketException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;

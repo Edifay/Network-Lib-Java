@@ -1,6 +1,5 @@
 package apifornetwork.data.packets;
 
-import apifornetwork.data.Data;
 import apifornetwork.tcp.SocketMake;
 
 import java.io.ByteArrayInputStream;
@@ -8,14 +7,11 @@ import java.io.IOException;
 
 import static apifornetwork.tcp.server.ServerTCP.packetFastSize;
 
-public class SendPacket extends Packet {
+public class SendFastPacket extends FastPacket {
 
-    protected final short packetSize;
-
-    public SendPacket(final short packetNumber, final byte[] data, final short packetLength, final boolean isFast) {
-        this.isFastPacket = isFast;
+    public SendFastPacket(final short packetNumber, final byte[] data, final short packetLength) {
+        super((short) (packetFastSize));
         this.packetNumber = packetNumber;
-        this.packetSize = isFast ? (short) (packetFastSize) : (short) (packetLength + headSize);
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         this.data = new byte[(int) Math.ceil((double) in.available() / (this.packetSize - headSize))][this.packetSize];
         short actualTable = 0;
@@ -29,17 +25,8 @@ public class SendPacket extends Packet {
         }
     }
 
-    public SendPacket(final short packetNumber, final byte[] data) throws IOException {
-        this(packetNumber, data, (short) (packetFastSize-headSize), false);
-    }
-
-    public SendPacket(final short packetNumber, final byte[] data, final short packetLength) {
-        this(packetNumber, data, packetLength, false);
-    }
-
-    @Override
-    public Data getData() {
-        return null;
+    public SendFastPacket(final short packetNumber, final byte[] data) throws IOException {
+        this(packetNumber, data, (short) (packetFastSize - headSize));
     }
 
     public int getSize() {
@@ -51,9 +38,12 @@ public class SendPacket extends Packet {
         for (byte[] datum : this.data) System.arraycopy(getByteFromShort(this.ID), 0, datum, 7, 2);
     }
 
-    public static SendPacket emptyPacketOf(int packetNumber, boolean isFast) {
-        int size = isFast ? packetFastSize : 1;
-        return new SendPacket((short) packetNumber, new byte[size], (short) size, isFast);
+    public static SendFastPacket emptyPacketOf(int packetNumber) {
+        return new SendFastPacket((short) packetNumber, new byte[packetFastSize], (short) packetFastSize);
+    }
+
+    public byte[][] getBytes() {
+        return this.data;
     }
 
 }
