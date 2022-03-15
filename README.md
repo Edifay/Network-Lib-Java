@@ -1,4 +1,4 @@
-# ApiForNetwork
+# Network Lib Java
 
 Ceci est une libraire pour le réseau et la gestion des sockets Java.
 
