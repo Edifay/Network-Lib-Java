@@ -2,7 +2,7 @@
 
 Ceci est une libraire pour le réseau et la gestion des sockets Java.
 
-Les classes principales à utliser sont ClientTCP et ServerTCP.
+Les classes principales à utliser sont ClientTCP et ServerTCP et leur version Secure, qui utilses le protocole TLSv.2.
 
 Par la suite tout est assez simple de compréhension dans les classes.
 
